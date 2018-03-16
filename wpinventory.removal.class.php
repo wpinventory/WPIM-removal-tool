@@ -29,7 +29,13 @@ class WPIMRemoval {
 		'ledger_item_cost',
 		'ledger_invoice',
 		'ledger_invoice_line',
-		'ledger_to_invoice'
+		'ledger_to_invoice',
+		// Payments
+		'payments',
+		// Locations
+		'inventory_to_location',
+		'location',
+		'location_transfer',
 	];
 
 	private $options = [
