@@ -5,7 +5,7 @@
  * Plugin Name:    WP Inventory Removal Tool
  * Plugin URI:    http://www.wpinventory.com
  * Description:    Removes all traces of WP Inventory from your database
- * Version:       0.0.1
+ * Version:       1.0.0
  * Author:        WP Inventory Manager
  * Author URI:    http://www.wpinventory.com/
  * Text Domain:    wpinventory
@@ -14,6 +14,8 @@
 class WPIMRemoval {
 	private $tables = [
 		'item',
+		// Added in a db version to update to UTF-8
+		'item_backup',
 		'label',
 		'category',
 		'image',
@@ -46,7 +48,8 @@ class WPIMRemoval {
 		'wpim_legacy_item_map',
 		'wpim_legacy_category_map',
 		'widget_wpinventory_categories_widget',
-		'widget_wpinventory_latest_items_widget'
+		'widget_wpinventory_latest_items_widget',
+		'wpim_default_data'
 	];
 
 	const MENU_SLUG = 'wpim_remover';
