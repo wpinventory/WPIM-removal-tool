@@ -5,7 +5,7 @@
  * Plugin Name:    WP Inventory Removal Tool
  * Plugin URI:    http://www.wpinventory.com
  * Description:    Removes all traces of WP Inventory from your database
- * Version:       1.0.1
+ * Version:       1.0.2
  * Author:        WP Inventory Manager
  * Author URI:    http://www.wpinventory.com/
  * Text Domain:    wpinventory
@@ -160,9 +160,8 @@ EOD;
 	public function process_tables( $remove = FALSE ) {
 		global $table_prefix, $wpdb;
 
-		if ( class_exists( 'WPIMDefaultItems' ) ) {
-			$default = new WPIMDefaultItems();
-			$default->delete_default_data();
+		if ( $remove ) {
+			$this->delete_default_media();
 		}
 
 		$count = 0;
@@ -194,6 +193,62 @@ EOD;
 				}
 			}
 		}
+	}
+
+	/**
+	 * On initial install, WPIM adds items, and images and media.
+	 * This ensures that the media / images added, if still present, get
+	 * deleted.
+	 */
+	public function delete_default_media() {
+		$data = get_option( 'wpim_default_data' );
+
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		global $wpdb, $table_prefix;
+
+		$image_table = "{$table_prefix}wpinventory_image";
+		$media_table = "{$table_prefix}wpinventory_media";
+
+		if ( ! empty( $data['media'] ) && empty( $data['images'] ) ) {
+			$data['images'] = array_slice( $data['media'], 0, 18 );
+			// keep only those IDs not put in the images array
+			$data['media'] = array_diff( $data['media'], $data['images'] );
+		}
+
+		foreach ( $data['images'] AS $image_id ) {
+			$image = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$image_table} WHERE image_id = %d", $image_id ) );
+			$wpdb->delete( $image_table, array( 'image_id' => $image_id ) );
+
+			if ( ! empty( $image->post_id ) ) {
+				wp_delete_attachment( $image->post_id, TRUE );
+			}
+		}
+
+		$dir = wp_upload_dir();
+
+		foreach ( $data['media'] AS $media_id ) {
+			$media = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$media_table} WHERE media_id = %d", $media_id ) );
+			$wpdb->delete( $media_table, array( 'media_id' => $media_id ) );
+
+			if ( ! empty( $media->media ) ) {
+
+				$path = $media->media;
+
+				if ( 0 === strpos( $path, $dir['baseurl'] . '/' ) ) {
+					$path = substr( $path, strlen( $dir['baseurl'] . '/' ) );
+				}
+
+				$post_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_wp_attached_file' AND meta_value=%s", $path ) );
+				if ( ! empty( $post_id ) ) {
+					wp_delete_attachment( $post_id, TRUE );
+				}
+			}
+		}
+
+		delete_option( 'wpim_default_data' );
 	}
 }
 
