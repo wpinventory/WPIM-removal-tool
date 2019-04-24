@@ -35,9 +35,9 @@ class WPIMRemoval {
 		// Payments
 		'payments',
 		// Locations
-		'inventory_to_location',
-		'location',
-		'location_transfer',
+		'loc_inventory_to_location',
+		'loc_location',
+		'loc_transfer',
 	];
 
 	private $options = [
