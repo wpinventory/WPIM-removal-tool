@@ -38,6 +38,8 @@ class WPIMRemoval {
 		'loc_inventory_to_location',
 		'loc_location',
 		'loc_transfer',
+		// Notifications
+		'notifications'
 	];
 
 	private $options = [
