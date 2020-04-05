@@ -39,7 +39,10 @@ class WPIMRemoval {
 		'loc_location',
 		'loc_transfer',
 		// Notifications
-		'notifications'
+		'notifications',
+		'item_reservation_settings',
+		'reservation',
+		'reservation_item'
 	];
 
 	private $options = [
